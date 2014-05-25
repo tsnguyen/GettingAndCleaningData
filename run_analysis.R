@@ -4,18 +4,39 @@
 #=======================================================
 
 if (!file.exists("./merged")) {dir.create("./merged")};
-df1 = read.table("./test/X_test.txt");
-df2 = read.table("./train/X_train.txt");
-write.table(rbind(df1, df2), "./merged/X_merged.txt")
 
-df1 = read.table("./test/Y_test.txt");
-df2 = read.table("./train/Y_train.txt");
-write.table(rbind(df1, df2), "./merged/Y_merged.txt")
+# create tidy data
 
-df1 = read.table("./test/subject_test.txt");
-df2 = read.table("./train/subject_train.txt");
-write.table(rbind(df1, df2), "./merged/subject_merged.txt")
 
+dfX1 <- read.table("./test/X_test.txt");
+dfX2 <- read.table("./train/X_train.txt");
+dfX  <- rbind(dfX1, dfX2);
+write.table(dfX, "./merged/X_merged.txt")
+
+dfY1 <- read.table("./test/Y_test.txt");
+dfY2 <- read.table("./train/Y_train.txt");
+dfY  <- rbind(dfY1, dfY2);
+write.table(dfY, "./merged/Y_merged.txt")
+
+df <- dfX
+df$Activity <- dfY$V1
+
+dfS1 <- read.table("./test/subject_test.txt");
+dfS2 <- read.table("./train/subject_train.txt");
+dfS  <- rbind(dfS1, dfS2);
+write.table(dfS, "./merged/subject_merged.txt")
+
+df$userID <- dfS$V1
+
+# take the average
+tidy <- aggregate( .~ Activity + userID, data = df, FUN = mean)
+
+labels <- read.table("activity_labels.txt");
+
+write.table(tidy, "./tidy.txt")
+
+
+# merge other files
 if (!file.exists("./merged/Inertial Signals")) {dir.create("./merged/Inertial Signals")}
 
 pathTest  = "./test/Inertial Signals";
